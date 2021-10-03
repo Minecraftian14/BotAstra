@@ -21,7 +21,7 @@ dependencies {
     annotationProcessor 'com.github.Minecraftian14:MyLOGGER:v5.6'
 
     // https://github.com/DV8FromTheWorld/JDA
-    ximplementation 'net.dv8tion:JDA:4.3.0_333'
+    implementation 'net.dv8tion:JDA:4.3.0_333'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'

@@ -1,0 +1,32 @@
+plugins {
+    id 'java-library'
+}
+
+group 'in.mcxiv.botastra'
+version '0.0.1'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+}
+
+dependencies {
+
+    // https://github.com/Minecraftian14/MyLOGGER
+    implementation 'com.github.Minecraftian14:MyLOGGER:v5.6'
+    annotationProcessor 'com.github.Minecraftian14:MyLOGGER:v5.6'
+
+    // https://github.com/DV8FromTheWorld/JDA
+    ximplementation 'net.dv8tion:JDA:4.3.0_333'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}

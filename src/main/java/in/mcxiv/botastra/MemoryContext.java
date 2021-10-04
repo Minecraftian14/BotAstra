@@ -2,17 +2,17 @@ package in.mcxiv.botastra;
 
 import in.mcxiv.botastra.util.Identifiable;
 
-public class MemoryContexts implements Identifiable {
+public class MemoryContext implements Identifiable {
 
 //    public static final MemoryContexts NONE = new MemoryContexts(RootMemoryContexts.NONE);
 
     private final int context_level;
 
-    public MemoryContexts(int context_level) {
+    public MemoryContext(int context_level) {
         this.context_level = context_level;
     }
 
-    public MemoryContexts(RootMemoryContexts context) {
+    public MemoryContext(RootMemoryContexts context) {
         this(context.identity());
     }
 
@@ -29,38 +29,38 @@ public class MemoryContexts implements Identifiable {
         return is(sub_context.identity());
     }
 
-    public boolean is(MemoryContexts sub_context) {
+    public boolean is(MemoryContext sub_context) {
         return is(sub_context.identity());
     }
 
-    public MemoryContexts add(int sub_context) {
+    public MemoryContext add(int sub_context) {
         int neo_context = context_level | sub_context;
         if (context_level != neo_context)
-            return new MemoryContexts(neo_context);
+            return new MemoryContext(neo_context);
         return this;
     }
 
-    public MemoryContexts add(RootMemoryContexts sub_context) {
+    public MemoryContext add(RootMemoryContexts sub_context) {
         return add(sub_context.identity());
     }
 
-    public MemoryContexts add(MemoryContexts sub_context) {
+    public MemoryContext add(MemoryContext sub_context) {
         return add(sub_context.identity());
     }
 
-    public MemoryContexts clear(int sub_context) {
+    public MemoryContext clear(int sub_context) {
         // TODO: Test if it works
         int neo_context = context_level & (~sub_context);
         if (context_level != neo_context)
-            return new MemoryContexts(neo_context);
+            return new MemoryContext(neo_context);
         return this;
     }
 
-    public MemoryContexts clear(RootMemoryContexts sub_context) {
+    public MemoryContext clear(RootMemoryContexts sub_context) {
         return clear(sub_context.identity());
     }
 
-    public MemoryContexts clear(MemoryContexts sub_context) {
+    public MemoryContext clear(MemoryContext sub_context) {
         return clear(sub_context.identity());
     }
 

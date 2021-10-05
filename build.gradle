@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'antlr'
 }
 
 group 'in.mcxiv.botastra'
@@ -14,10 +15,15 @@ repositories {
     }
 }
 
+configurations {
+    provided
+    implementation.extendsFrom(provided)
+}
+
 dependencies {
 
-//    // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
-//    implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
+    antlr "org.antlr:antlr4:4.9.2"
+
     // https://mvnrepository.com/artifact/com.h2database/h2
     implementation 'com.h2database:h2:1.4.200'
 
@@ -25,11 +31,56 @@ dependencies {
     implementation 'com.github.Minecraftian14:MyLOGGER:v5.6'
     annotationProcessor 'com.github.Minecraftian14:MyLOGGER:v5.6'
 
+    // https://mvnrepository.com/artifact/com.google.auto.service/auto-service
+    implementation 'com.google.auto.service:auto-service:1.0'
+
+    // https://mvnrepository.com/artifact/com.squareup/javapoet
+    implementation 'com.squareup:javapoet:1.13.0'
+
     // https://github.com/DV8FromTheWorld/JDA
-    implementation 'net.dv8tion:JDA:4.3.0_333'
+//    implementation 'net.dv8tion:JDA:4.3.0_333'
+    // We use "provided" instead of "implementation", because for annotation
+    // processor to work properly, we need the "class" files of listener adaptor
+    // and it's included events. Note that "implemention"ed libraries class files
+    // are not included in the built jar!
+    // TODO: have two separate jars - one which include the JDA and one which doesn't. Optionally remove CommandProcessor and /lang/ in the later.
+    provided 'net.dv8tion:JDA:4.3.0_333'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+generateGrammarSource {
+    outputDirectory = file("${project.buildDir}/generated-src/antlr/main/in/mcxiv/antlr")
+    arguments += ["-visitor"]
+}
+
+task printDependencyFiles {
+    doLast {
+        configurations.provided.asFileTree.files.collect {
+            println it.name.endsWith(".jar")
+        }
+    }
+}
+
+task testBuildJar_(type: Copy, dependsOn: jar) {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    from jar
+    from configurations.provided.asFileTree.files.collect {
+        if (it.name.endsWith(".jar"))
+            zipTree(it)
+    }
+//    into file('./../BotAstraTest/libs/')
+}
+
+task testBuildJar(type: Jar) {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    with jar
+    from configurations.provided.asFileTree.files.collect {
+        if (it.name.endsWith(".jar"))
+            zipTree(it)
+    }
+    destinationDirectory.set(file('./../BotAstraTest/libs/'))
 }
 
 test {

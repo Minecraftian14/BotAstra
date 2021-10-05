@@ -5,7 +5,7 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.github.Minecraftian14/MyLOGGER/v5.6/5154165bd999a152349f8dc00fa9a60c7d332f2c/MyLOGGER-v5.6.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.Minecraftian14/MyLOGGER/v5.6/5154165bd999a152349f8dc00fa9a60c7d332f2c/MyLOGGER-v5.6.jar" />
         </processorPath>
         <module name="BotAstra.main" />
       </profile>

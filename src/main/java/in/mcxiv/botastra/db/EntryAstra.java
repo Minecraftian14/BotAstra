@@ -48,13 +48,14 @@ public class EntryAstra {
         return Try.Ignore(() -> Float.parseFloat(atS(x, y)), -1f);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T atT(int x, int y) {
         return (T) at(x, y);
     }
 
     public boolean colContains(int colIdx, String value) {
-        for (int i = colIdx; i < array.length; i+=columns)
-            if(Objects.equals(array[i], value))
+        for (int i = colIdx; i < array.length; i += columns)
+            if (Objects.equals(array[i], value))
                 return true;
         return false;
     }

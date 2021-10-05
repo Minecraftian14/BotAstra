@@ -159,7 +159,7 @@ public class DatabaseInterface {
             default:
                 System.out.printf("WARNING: Unregistered Type %s found in DatabaseInterface.getSuitableWidthForType.\n", type);
             case "VARCHAR":
-                return 50;
+                return 40;
         }
     }
 

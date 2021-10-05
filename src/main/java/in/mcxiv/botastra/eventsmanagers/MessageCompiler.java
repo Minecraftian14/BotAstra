@@ -1,63 +1,82 @@
 package in.mcxiv.botastra.eventsmanagers;
 
-import net.dv8tion.jda.api.events.message.MessageBulkDeleteEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageEmbedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveAllEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEmoteEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
+import in.mcxiv.botastra.proc.BaseCompatibilityListenerAdapter;
+import in.mcxiv.botastra.util.Try;
 
-import javax.annotation.Nonnull;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-public class MessageCompiler extends ListenerAdapter {
+public class MessageCompiler {
 
-    @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        // TODO: Implement a proper handle.
+    private enum Type {
+        INT,
+        FLOAT,
+        BOOLEAN,
+        STRING;
+
+        static Type classToType(Class<?> clazz) {
+            if (clazz.equals(int.class)) return Type.INT;
+            if (clazz.equals(float.class)) return Type.FLOAT;
+            if (clazz.equals(boolean.class)) return Type.BOOLEAN;
+            if (clazz.equals(String.class)) return Type.STRING;
+            throw new IllegalArgumentException("Unknown primitive class " + clazz);
+        }
     }
 
-    @Override
-    public void onGuildMessageUpdate(@NotNull GuildMessageUpdateEvent event) {
-        // TODO: Implement a proper handle.
+    public static <T> T createSchemaObject(String text, Class<T> clazz) {
+        try {
+            return createSchemaObjectE(text, clazz);
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    @Override
-    public void onGuildMessageDelete(@NotNull GuildMessageDeleteEvent event) {
-        // TODO: Implement a proper handle.
+    public static void main(String[] args) {
+        for (Method method : BaseCompatibilityListenerAdapter.TestClass.class.getDeclaredMethods()) {
+            System.out.println(method.getName());
+        }
     }
 
-    @Override
-    public void onGuildMessageEmbed(@NotNull GuildMessageEmbedEvent event) {
-        // TODO: Implement a proper handle.
+    public static <T> T createSchemaObjectE(String text, Class<T> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+
+        T instance = clazz.getConstructor().newInstance();
+        Method constructor = clazz.getDeclaredMethods()[0];
+        Class<?>[] paramCls = constructor.getParameterTypes();
+
+        String[] args = text.split(" ");
+
+        Object[] paramVal = new Object[paramCls.length];
+
+        for (int i = 0; i < Math.min(args.length, paramVal.length); i++) {
+            paramVal[i] = switch (Type.classToType(paramCls[i])){
+                case INT -> intify(args[i]);
+                case FLOAT -> floatify(args[i]);
+                case BOOLEAN -> booleanify(args[i]);
+                case STRING -> stringify(args[i]);
+            };
+        }
+
+        constructor.invoke(instance, paramVal);
+
+        return instance;
+
     }
 
-    @Override
-    public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
-        // TODO: Implement a proper handle.
+    private static int intify(String arg) {
+        return Try.Ignore(() -> Integer.parseInt(arg.replaceAll("[^0-9]", "")), -1);
     }
 
-    @Override
-    public void onGuildMessageReactionRemove(@NotNull GuildMessageReactionRemoveEvent event) {
-        // TODO: Implement a proper handle.
+    private static float floatify(String arg) {
+        return Try.Ignore(() -> Float.parseFloat(arg.replaceAll("[^0-9.]", "")), -1f);
     }
 
-    @Override
-    public void onGuildMessageReactionRemoveAll(@NotNull GuildMessageReactionRemoveAllEvent event) {
-        // TODO: Implement a proper handle.
+    private static boolean booleanify(String arg) {
+        return Try.Ignore(() -> Boolean.parseBoolean(arg), false);
     }
 
-    @Override
-    public void onGuildMessageReactionRemoveEmote(@NotNull GuildMessageReactionRemoveEmoteEvent event) {
-        // TODO: Implement a proper handle.
+    private static String  stringify(String arg) {
+        return arg;
     }
 
-    @Override
-    public void onMessageBulkDelete(@Nonnull MessageBulkDeleteEvent event) {
-        // TODO: Implement a proper handle.
-    }
 }

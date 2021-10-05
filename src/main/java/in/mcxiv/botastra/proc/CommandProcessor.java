@@ -4,14 +4,18 @@ import com.google.auto.service.AutoService;
 import com.mcxiv.logger.decorations.ConsoleDecoration;
 import com.mcxiv.logger.decorations.Format;
 import com.mcxiv.logger.formatted.FLog;
-import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.*;
+import in.mcxiv.botastra.MemoryContext;
+import in.mcxiv.botastra.Platform;
 import in.mcxiv.botastra.csd.CsdToJavaSourceGenerator;
 import in.mcxiv.botastra.proc.lang.LanguageAPI;
 import in.mcxiv.botastra.proc.lang.LisAdaMeta;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -90,6 +94,12 @@ public class CommandProcessor extends AbstractProcessor {
     private void processElements(List<ExecutableElement> executableElements) {
 
         HashMap<String, List<ExecutableElement>> eventsUsed = new HashMap<>();
+        HashMap<ExecutableElement, String> schemaMap = new HashMap<>();
+        HashMap<ExecutableElement, Integer> contextMap = new HashMap<>();
+
+        SORT_METHODS_CREATED_BY_THE_EVENTS_THEY_ARE_REGISTERED_TO:
+        AND:
+        RETRIEVE_ALL_RELATED_ANNOTATION_DEFINITIONS:
 
         for (ExecutableElement element : executableElements) {
 
@@ -98,22 +108,62 @@ public class CommandProcessor extends AbstractProcessor {
 
             String eventClassName = eventEle.asType().toString();
             log.prt("Element found as", eventClassName);
-            log.prt("Constructed Method as", lisAdaMeta.createAMethod(eventClassName));
 
             // Add entry to map object.
 
-            if(!eventsUsed.containsKey(eventClassName))
+            if (!eventsUsed.containsKey(eventClassName))
                 eventsUsed.put(eventClassName, new ArrayList<>());
 
             eventsUsed.get(eventClassName).add(element);
 
             // Retrieve schema constraints if any.
             SchemaObject schema = element.getAnnotation(SchemaObject.class);
-            if(schema!=null) {
-                writeJavaFile(CsdToJavaSourceGenerator.generate(schema.value()));
+            if (schema != null) {
+                JavaFile schemaFile = CsdToJavaSourceGenerator.generate(schema.value(), element.getSimpleName() + "Schema");
+                schemaMap.put(element, schemaFile.packageName + "." + schemaFile.typeSpec.name);
+                writeJavaFile(schemaFile);
             }
 
+            // Retrieve schema constraints if any.
+            SetMemoryContext context = element.getAnnotation(SetMemoryContext.class);
+            if (context != null) {
+                contextMap.put(element, context.value());
+            }
         }
+
+        USE_ALL_THE_COLLECTED_DATA_TO_CREATE_A_LIS_ADA:
+        {
+
+            TypeSpec.Builder lisAda = TypeSpec.classBuilder("BaseCompatibilityListenerAdapter")
+                    .addModifiers(Modifier.PUBLIC)
+                    .superclass(ListenerAdapter.class)
+                    .addField(FieldSpec.builder(Platform.class, "platform", Modifier.PRIVATE, Modifier.FINAL).build())
+                    .addMethod(MethodSpec.constructorBuilder()
+                            .addParameter(Platform.class, "platform")
+                            .addStatement("this.platform = platform")
+                            .build());
+
+            for (String eventClassName : eventsUsed.keySet()) {
+                MethodSpec.Builder eventMethod = lisAdaMeta.createAMethod(eventClassName);
+
+                for (ExecutableElement command : eventsUsed.get(eventClassName)) {
+
+                    if(contextMap.containsKey(command))
+                        eventMethod.addStatement("platform.memory = platform.createDefaultMemory($S, new MemoryContext($L))", command.getSimpleName(), contextMap.get(command));
+
+                    if(schemaMap.containsKey(command))
+                        eventMethod.addStatement("platform.schema = MessageCompiler.createSchemaObject(event.getMessage().toString(), $L.class)", schemaMap.get(command));
+
+                    eventMethod.addStatement("methodHere(platform, event)");
+                }
+
+                lisAda.addMethod(eventMethod.build());
+            }
+
+            writeJavaFile(JavaFile.builder("in.mcxiv.gen", lisAda.build()).build());
+
+        }
+
     }
 
     private void writeJavaFile(JavaFile file) {

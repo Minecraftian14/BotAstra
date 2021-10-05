@@ -14,14 +14,14 @@ import java.util.Queue;
 
 public class CsdToJavaSourceGenerator extends CSDBaseVisitor<TypeSpec.Builder> {
 
-    public static JavaFile generate(String CSD) {
+    public static JavaFile generate(String CSD, String className) {
         CSDLexer lexer = new CSDLexer(CharStreams.fromString(CSD));
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         CSDParser parser = new CSDParser(tokens);
 
         CSDParser.CsdContext tree = parser.csd();
-        CsdToJavaSourceGenerator visitor = new CsdToJavaSourceGenerator("TestClass");
+        CsdToJavaSourceGenerator visitor = new CsdToJavaSourceGenerator(className);
         TypeSpec build = visitor.visit(tree).build();
 
         return JavaFile.builder("in.mcxiv.gen", build)
@@ -68,6 +68,8 @@ public class CsdToJavaSourceGenerator extends CSDBaseVisitor<TypeSpec.Builder> {
         public ObjectVisitor() {
             this.type = TypeSpec.classBuilder(className + (count == 0 ? "" : count))
                     .addModifiers(Modifier.PUBLIC);
+            if(!baseClass.equals(type))
+                type.addModifiers(Modifier.STATIC);
             count++;
         }
 
@@ -93,7 +95,9 @@ public class CsdToJavaSourceGenerator extends CSDBaseVisitor<TypeSpec.Builder> {
         public FieldSpec visitPair(CSDParser.PairContext ctx) {
             String varName = ctx.VARIABLE_NAME().getText();
             TypeVisitor.MetaType type = new TypeVisitor().visitType(ctx.type());
-            FieldSpec spec = FieldSpec.builder(type.name, varName, Modifier.PUBLIC).build();
+            FieldSpec spec = FieldSpec.builder(type.name, varName, Modifier.PUBLIC)
+                    .initializer(type.initializer())
+                    .build();
 
             if (type.isPrimitive())
                 fields.add(spec);
@@ -173,6 +177,17 @@ public class CsdToJavaSourceGenerator extends CSDBaseVisitor<TypeSpec.Builder> {
 
             public boolean isPrimitive() {
                 return isPrimitive;
+            }
+
+            public String initializer() {
+                if (isPrimitive) {
+                    if(name.equals(TypeName.INT)) return "-1";
+                    if(name.equals(TypeName.FLOAT)) return "-1f";
+                    if(name.equals(TypeName.BOOLEAN)) return "false";
+                    // assuming that it might be a String
+                    return "\"\"";
+                }
+                return String.format("new %s()", name);
             }
         }
     }

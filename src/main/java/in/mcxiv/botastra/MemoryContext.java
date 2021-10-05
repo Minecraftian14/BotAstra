@@ -4,7 +4,7 @@ import in.mcxiv.botastra.util.Identifiable;
 
 public class MemoryContext implements Identifiable {
 
-//    public static final MemoryContexts NONE = new MemoryContexts(RootMemoryContexts.NONE);
+    public static final MemoryContext DEFAULT = new MemoryContext(RootMemoryContexts.USER);
 
     private final int context_level;
 

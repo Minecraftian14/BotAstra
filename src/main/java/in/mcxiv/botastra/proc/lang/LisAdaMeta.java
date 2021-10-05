@@ -1,8 +1,11 @@
 package in.mcxiv.botastra.proc.lang;
 
+import com.squareup.javapoet.*;
 import in.mcxiv.botastra.proc.CommandProcessor;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
+import javax.lang.model.element.Modifier;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,15 +39,17 @@ public class LisAdaMeta {
 
     }
 
-    public String createAMethod(String eventName) {
-        assert map.containsKey(eventName);
+    public MethodSpec.Builder createAMethod(String eventClassName) {
+        assert map.containsKey(eventClassName);
 
-        return String.format(
-                """
-                            public void %1$s(@Nonnull %2$s event) {
-                                
-                            }
-                        """, map.get(eventName), eventName);
+        return MethodSpec.methodBuilder(map.get(eventClassName))
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .addParameter(ParameterSpec.builder(ClassName.get("package", map.get(eventClassName)), "event" )
+                        .addAnnotation(NotNull.class)
+                        .build());
     }
+
+
 
 }

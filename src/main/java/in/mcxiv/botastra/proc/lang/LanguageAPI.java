@@ -2,6 +2,7 @@ package in.mcxiv.botastra.proc.lang;
 
 import in.mcxiv.botastra.Platform;
 import in.mcxiv.botastra.proc.CommandProcessor;
+import in.mcxiv.botastra.proc.SetPrefix;
 import net.dv8tion.jda.api.events.GenericEvent;
 
 import javax.lang.model.element.Element;
@@ -11,6 +12,8 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 public final class LanguageAPI {
 
@@ -22,6 +25,22 @@ public final class LanguageAPI {
     public LanguageAPI(CommandProcessor processor) {
         typeUtils = processor.typeUtils;
         elementUtils = processor.elementUtils;
+    }
+
+    public SetPrefix outAsAnnotations(Element element) {
+        return element.getAnnotation(SetPrefix.class);
+    }
+
+    public String[] outTheValues(SetPrefix anno) {
+        return anno.value();
+    }
+
+    public Stream<String> asStreams(String[] strings) {
+        return Arrays.stream(strings);
+    }
+
+    public String toQuotedString(String s) {
+        return "\"" + s + "\"";
     }
 
     public boolean inAllMethods(Element element) {
@@ -71,4 +90,5 @@ public final class LanguageAPI {
     public boolean inEventMethods(Method method) {
         return method.getName().startsWith("on");
     }
+
 }

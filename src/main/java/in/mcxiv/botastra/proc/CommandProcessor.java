@@ -8,6 +8,7 @@ import com.squareup.javapoet.*;
 import in.mcxiv.botastra.MemoryContext;
 import in.mcxiv.botastra.Platform;
 import in.mcxiv.botastra.csd.CsdToJavaSourceGenerator;
+import in.mcxiv.botastra.eventsmanagers.MessageCompiler;
 import in.mcxiv.botastra.proc.lang.LanguageAPI;
 import in.mcxiv.botastra.proc.lang.LisAdaMeta;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -22,17 +23,23 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_16)
-@SupportedAnnotationTypes("in.mcxiv.botastra.proc.BindCommand")
 @AutoService(Processor.class)
 public class CommandProcessor extends AbstractProcessor {
 
     public static FLog log;
+
+    private static final String MessageCompilerP = MessageCompiler.class.getName();
+    private static final String MemoryContextP = MemoryContext.class.getName();
 
     private final StringBuilder builder = new StringBuilder();
     private Messager messager;
@@ -66,11 +73,37 @@ public class CommandProcessor extends AbstractProcessor {
     }
 
     @Override
-    @Format({":$BBu:", ":: > :$Yn:"})
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        doop("Processing Request Received");
+        try {
+            return processEscaper(annotations, roundEnv);
+        } catch (Exception e) {
+            e.printStackTrace(new PrintStream(new OutputStream() {
+                @Override
+                public void write(int b) throws IOException {
+                    builder.append((char) b);
+                }
+            }));
+//            return flagHasProcessedOnce = endProcess(true, roundEnv);
+            return flagHasProcessedOnce = false;
+        }
+    }
+
+    @Format({":$BBu:", ":: > :$Yn:"})
+    public boolean processEscaper(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) throws Exception {
         log.prt("Processing Requested", flagHasProcessedOnce ? "Declined" : "Accepted");
         if (flagHasProcessedOnce) return endProcess(false, roundEnv);
         log.prt("Processing Starts", System.currentTimeMillis());
+
+        List<String> prefixes = roundEnv
+                .getElementsAnnotatedWith(SetPrefix.class)
+                .stream()
+                .map(__::outAsAnnotations)
+                .map(__::outTheValues)
+                .flatMap(__::asStreams)
+                .distinct()
+                .map(__::toQuotedString)
+                .toList();
 
         List<ExecutableElement> executableElements = roundEnv
                 .getElementsAnnotatedWith(BindCommand.class)
@@ -85,13 +118,13 @@ public class CommandProcessor extends AbstractProcessor {
 
         log.prt("Total number of commands found:", executableElements.size());
 
-        processElements(executableElements);
+        processElements(executableElements, prefixes);
 
         return flagHasProcessedOnce = endProcess(true, roundEnv);
     }
 
-    @Format({":$G:", ":: > :$BYn:"})
-    private void processElements(List<ExecutableElement> executableElements) {
+    @Format({":$BBu:", ":: > :$Yn:"})
+    public void processElements(List<ExecutableElement> executableElements, List<String> prefixes) throws Exception {
 
         HashMap<String, List<ExecutableElement>> eventsUsed = new HashMap<>();
         HashMap<ExecutableElement, String> schemaMap = new HashMap<>();
@@ -110,7 +143,6 @@ public class CommandProcessor extends AbstractProcessor {
             log.prt("Element found as", eventClassName);
 
             // Add entry to map object.
-
             if (!eventsUsed.containsKey(eventClassName))
                 eventsUsed.put(eventClassName, new ArrayList<>());
 
@@ -119,15 +151,18 @@ public class CommandProcessor extends AbstractProcessor {
             // Retrieve schema constraints if any.
             SchemaObject schema = element.getAnnotation(SchemaObject.class);
             if (schema != null) {
-                JavaFile schemaFile = CsdToJavaSourceGenerator.generate(schema.value(), element.getSimpleName() + "Schema");
+                String csd = schema.value();
+                JavaFile schemaFile = CsdToJavaSourceGenerator.generate(csd, element.getSimpleName() + "Schema");
                 schemaMap.put(element, schemaFile.packageName + "." + schemaFile.typeSpec.name);
                 writeJavaFile(schemaFile);
+                log.prt("Schema found!", csd.replace("\n", "\\n"));
             }
 
             // Retrieve schema constraints if any.
             SetMemoryContext context = element.getAnnotation(SetMemoryContext.class);
             if (context != null) {
                 contextMap.put(element, context.value());
+                log.prt("Context Definition Found!", Integer.toBinaryString(context.value()));
             }
         }
 
@@ -137,24 +172,44 @@ public class CommandProcessor extends AbstractProcessor {
             TypeSpec.Builder lisAda = TypeSpec.classBuilder("BaseCompatibilityListenerAdapter")
                     .addModifiers(Modifier.PUBLIC)
                     .superclass(ListenerAdapter.class)
+                    .addField(FieldSpec.builder(TypeName.get(String[].class), "prefixes", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                            .initializer("new String[] {$L}", String.join(", ", prefixes))
+                            .build())
                     .addField(FieldSpec.builder(Platform.class, "platform", Modifier.PRIVATE, Modifier.FINAL).build())
                     .addMethod(MethodSpec.constructorBuilder()
+                            .addModifiers(Modifier.PUBLIC)
                             .addParameter(Platform.class, "platform")
                             .addStatement("this.platform = platform")
+                            .build())
+                    .addMethod(MethodSpec.methodBuilder("verifyCommand")
+                            .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                            .returns(TypeName.get(String.class))
+                            .addParameter(TypeName.get(String.class), "msg")
+                            .addCode("""
+                                    for (int i = 0; i < prefixes.length; i++)\s
+                                        if(msg.startsWith(prefixes[i]))
+                                            return msg.substring(prefixes[i].length()+1);
+                                    return null;
+                                    """)
                             .build());
 
+
+            log.prt("Number of events used", eventsUsed.size());
             for (String eventClassName : eventsUsed.keySet()) {
+                List<ExecutableElement> commands = eventsUsed.get(eventClassName);
+                log.prt("-> " + eventClassName + " used", commands.size() + " times");
+
                 MethodSpec.Builder eventMethod = lisAdaMeta.createAMethod(eventClassName);
 
-                for (ExecutableElement command : eventsUsed.get(eventClassName)) {
+                for (ExecutableElement command : commands) {
 
-                    if(contextMap.containsKey(command))
-                        eventMethod.addStatement("platform.memory = platform.createDefaultMemory($S, new MemoryContext($L))", command.getSimpleName(), contextMap.get(command));
+                    if (contextMap.containsKey(command))
+                        eventMethod.addStatement("platform.memory = platform.createDefaultMemory($S, new $L($L))", command.getSimpleName(), MemoryContextP, contextMap.get(command));
 
-                    if(schemaMap.containsKey(command))
-                        eventMethod.addStatement("platform.schema = MessageCompiler.createSchemaObject(event.getMessage().toString(), $L.class)", schemaMap.get(command));
+                    if (schemaMap.containsKey(command))
+                        eventMethod.addStatement("platform.schema = $L.createSchemaObject(raw, $L.class)", MessageCompilerP, schemaMap.get(command));
 
-                    eventMethod.addStatement("methodHere(platform, event)");
+                    eventMethod.addStatement("$L.$L(platform, event)", command.getEnclosingElement().asType().toString(), command.getSimpleName().toString());
                 }
 
                 lisAda.addMethod(eventMethod.build());
@@ -176,6 +231,8 @@ public class CommandProcessor extends AbstractProcessor {
 
     private void append(String[] strings) {
         for (String string : strings) builder.append(string);
+        doop(builder.toString());
+        builder.setLength(0);
     }
 
     private boolean endProcess(boolean result, RoundEnvironment roundEnv) {
@@ -187,8 +244,8 @@ public class CommandProcessor extends AbstractProcessor {
         messager.printMessage(Diagnostic.Kind.NOTE, msg);
     }
 
-//    @Override
-//    public Set<String> getSupportedAnnotationTypes() {
-//        return Set.of(BindCommand.class.getCanonicalName());
-//    }
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        return Set.of(BindCommand.class.getCanonicalName(), SetPrefix.class.getCanonicalName());
+    }
 }

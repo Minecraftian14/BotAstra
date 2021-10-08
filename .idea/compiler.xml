@@ -5,9 +5,44 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.Minecraftian14/MyLOGGER/v5.6/5154165bd999a152349f8dc00fa9a60c7d332f2c/MyLOGGER-v5.6.jar" />
+          <entry name="$PROJECT_DIR$/build/libs/BotAstra-0.0.1.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/org.antlr/antlr4/4.9.2/a34d0bb512c1bd54d1d59cced3f7cbc0b0d1a495/antlr4-4.9.2.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.h2database/h2/1.4.200/f7533fe7cb8e99c87a43d325a77b4b678ad9031a/h2-1.4.200.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.google.auto.service/auto-service/1.0/badf27cfb4fb2e7cd2579a95b00ef578cc5491fa/auto-service-1.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.github.Minecraftian14/MyLOGGER/v5.6/5154165bd999a152349f8dc00fa9a60c7d332f2c/MyLOGGER-v5.6.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.squareup/javapoet/1.13.0/d6562d385049f35eb50403fa86bb11cce76b866a/javapoet-1.13.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/4.3.0_333/2a2858fb7885784becc065c9679336a8d3b961b4/JDA-4.3.0_333.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/org.antlr/antlr4-runtime/4.9.2/ece33ec76e002dfde574cf7b57451a91a99185c5/antlr4-runtime-4.9.2.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/org.antlr/ST4/4.3/92f2c1ad8d84abcbeead6cf7f2c53a04166293c2/ST4-4.3.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/org.antlr/antlr-runtime/3.5.2/cd9cd41361c155f3af0f653009dcecb08d8b4afd/antlr-runtime-3.5.2.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/org.abego.treelayout/org.abego.treelayout.core/1.0.3/457216e8e6578099ae63667bb1e4439235892028/org.abego.treelayout.core-1.0.3.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/org.glassfish/javax.json/1.0.4/3178f73569fd7a1e5ffc464e680f7a8cc784b85a/javax.json-1.0.4.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.ibm.icu/icu4j/61.1/28d33b5e44e72edcc66a5da7a34a42147f38d987/icu4j-61.1.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.google.auto.service/auto-service-annotations/1.0/c628bf87e8b708c707aa523033d90fb0eb2d6495/auto-service-annotations-1.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.google.auto/auto-common/1.0/41d5dbfadf17625071d3f4a8b7f7a6d70dcd3c8f/auto-common-1.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/30.1.1-jre/87e0fd1df874ea3cbe577702fe6f17068b790fd8/guava-30.1.1-jre.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/net.sf.trove4j/trove4j/3.0.3/42ccaf4761f0dfdfa805c9e340d99a755907e2dd/trove4j-3.0.3.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.10.1/18eee15ffc662d27538d5b6ee84e4c92c0a9d03e/jackson-databind-2.10.1.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/25ea2e8b0c338a877313bd4672d3fe056ea78f0d/jsr305-3.0.2.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/16.0.1/c1a6655cebcac68e63e4c24d23f573035032eb2a/annotations-16.0.1.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.25/da76ca59f6a57ee3102f8f9bd9cee742973efa8a/slf4j-api-1.7.25.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.neovisionaries/nv-websocket-client/2.14/1b66d37914b232cef45e56ec8c01907620de9e3a/nv-websocket-client-2.14.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.13.0/f53f6362226e4546c3987b8693f3d6976df8c797/okhttp-3.13.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/club.minnced/opus-java/1.1.0/60c84f3ccfa0515214491f429cfc76581f0190c4/opus-java-1.1.0.pom" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-collections4/4.1/a4cf4688fe1c7e3a63aa636cc96d013af537768e/commons-collections4-4.1.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.google.guava/failureaccess/1.0.1/1dcf1de382a0bf95a3d8b0849546c88bac1292c9/failureaccess-1.0.1.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.google.guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/b421526c5f297295adef1c886e5246c39d4ac629/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/org.checkerframework/checker-qual/3.8.0/6b83e4a33220272c3a08991498ba9dc09519f190/checker-qual-3.8.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.5.1/562d366678b89ce5d6b6b82c1a073880341e3fba/error_prone_annotations-2.5.1.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.google.j2objc/j2objc-annotations/1.3/ba035118bc8bac37d7eff77700720999acd9986d/j2objc-annotations-1.3.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.10.1/54d72475c0d6819f2d0e9a09d25c3ed876a4972f/jackson-annotations-2.10.1.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.10.1/2c8b5e26ba40e5f91eb37a24075a2028b402c5f9/jackson-core-2.10.1.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.17.2/78c7820b205002da4d2d137f6f312bd64b3d6049/okio-1.17.2.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/club.minnced/opus-java-api/1.1.0/192bece8c964b64a0549ce3afaddb4837d7e070e/opus-java-api-1.1.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/club.minnced/opus-java-natives/1.1.0/887c3102a597284591593af9262389c589e4cf7/opus-java-natives-1.1.0.jar" />
+          <entry name="$PROJECT_DIR$/../../../Applications/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.4.0/cb208278274bf12ebdb56c61bd7407e6f774d65a/jna-4.4.0.jar" />
         </processorPath>
-        <module name="BotAstra.main" />
+        <module name="BotAstra.TestProject.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="16" />

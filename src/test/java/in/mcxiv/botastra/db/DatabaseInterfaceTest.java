@@ -12,6 +12,7 @@ import java.util.Random;
 import static in.mcxiv.botastra.MemoryContext.RootMemoryContexts.CHANNEL;
 import static in.mcxiv.botastra.MemoryContext.RootMemoryContexts.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DatabaseInterfaceTest {
 
@@ -61,6 +62,7 @@ class DatabaseInterfaceTest {
         }
 
         dbi.createTable("MEMORY_TEST");
+        DatabaseInterface.poopResultSet(dbi.selectStar("MEMORY_TEST"));
 
         Memory memory = new Memory(dbi, "MEMORY_TEST", "testMemory()", new MemoryContext(USER).add(CHANNEL));
 
@@ -75,6 +77,8 @@ class DatabaseInterfaceTest {
         memory.put("ranS", ranS);
         memory.put("ranL", ranL);
 
+        DatabaseInterface.poopResultSet(dbi.selectStar("MEMORY_TEST"));
+
         int new_ranI = memory.getI("ranI");
         float new_ranF = memory.getF("ranF");
         String new_ranS = memory.getS("ranS");
@@ -86,6 +90,25 @@ class DatabaseInterfaceTest {
         assertEquals(ranF, new_ranF);
         assertEquals(ranS, new_ranS);
 //        assertEquals(ranL, new_ranL);
+    }
+
+    @Test
+    void testMemoryUpdating() {
+
+        dbi.createTable("MEMORY_TEST");
+
+        DatabaseInterface.poopResultSet(dbi.selectStar("MEMORY_TEST"));
+
+        Memory memory = new Memory(dbi, "MEMORY_TEST", "testMemoryUpdating()", new MemoryContext(USER).add(CHANNEL));
+
+        Random random = new Random();
+        float ranF = random.nextFloat();
+
+        memory.put("ranF", memory.getF("ranF")+ranF);
+        float new_ranF = memory.getF("ranF");
+
+        System.out.println(ranF +" "+ new_ranF);
+        assertTrue(ranF < new_ranF);
     }
 
     public void dropAll() {

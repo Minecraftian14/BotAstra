@@ -14,7 +14,14 @@ import java.util.Queue;
 
 public class CsdToJavaSourceGenerator extends CSDBaseVisitor<TypeSpec.Builder> {
 
+    public static final String PACKAGE = "in.mcxiv.gen";
+
     public static JavaFile generate(String CSD, String className) {
+
+        CSD = CSD.strip();
+        if (!CSD.startsWith("{")) CSD = "{" + CSD;
+        if (!CSD.startsWith("}")) CSD += "}";
+
         CSDLexer lexer = new CSDLexer(CharStreams.fromString(CSD));
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -24,7 +31,9 @@ public class CsdToJavaSourceGenerator extends CSDBaseVisitor<TypeSpec.Builder> {
         CsdToJavaSourceGenerator visitor = new CsdToJavaSourceGenerator(className);
         TypeSpec build = visitor.visit(tree).build();
 
-        return JavaFile.builder("in.mcxiv.gen", build)
+        ObjectVisitor.count=0;
+
+        return JavaFile.builder(PACKAGE, build)
                 .build();
     }
 
@@ -49,7 +58,8 @@ public class CsdToJavaSourceGenerator extends CSDBaseVisitor<TypeSpec.Builder> {
         visitor.visitObj(ctx.obj());
 
         // Add a method for all fields
-        MethodSpec.Builder construct = MethodSpec.methodBuilder("construct");
+        MethodSpec.Builder construct = MethodSpec.methodBuilder("construct")
+                .addModifiers(Modifier.PUBLIC);
         while (!fields.isEmpty()) {
             FieldSpec spec = fields.remove();
             construct.addParameter(spec.type, spec.name);
@@ -66,9 +76,9 @@ public class CsdToJavaSourceGenerator extends CSDBaseVisitor<TypeSpec.Builder> {
         TypeSpec.Builder type;
 
         public ObjectVisitor() {
-            this.type = TypeSpec.classBuilder(className + (count == 0 ? "" : count))
-                    .addModifiers(Modifier.PUBLIC);
-            if(!baseClass.equals(type))
+            this.type = TypeSpec.classBuilder(className + (count == 0 ? "" : count));
+            this.type.addModifiers(Modifier.PUBLIC);
+            if (baseClass != null) // if baseClass == null, ObjectVisitor has been called for the first time, and that also means that we are currently creating the base class.
                 type.addModifiers(Modifier.STATIC);
             count++;
         }
@@ -171,7 +181,7 @@ public class CsdToJavaSourceGenerator extends CSDBaseVisitor<TypeSpec.Builder> {
             }
 
             MetaType(TypeSpec spec) {
-                this.name = ClassName.get("in.mcxiv.gen", spec.name);
+                this.name = ClassName.get(PACKAGE+"."+className, spec.name);
                 isPrimitive = false;
             }
 
@@ -181,9 +191,9 @@ public class CsdToJavaSourceGenerator extends CSDBaseVisitor<TypeSpec.Builder> {
 
             public String initializer() {
                 if (isPrimitive) {
-                    if(name.equals(TypeName.INT)) return "-1";
-                    if(name.equals(TypeName.FLOAT)) return "-1f";
-                    if(name.equals(TypeName.BOOLEAN)) return "false";
+                    if (name.equals(TypeName.INT)) return "-1";
+                    if (name.equals(TypeName.FLOAT)) return "-1f";
+                    if (name.equals(TypeName.BOOLEAN)) return "false";
                     // assuming that it might be a String
                     return "\"\"";
                 }

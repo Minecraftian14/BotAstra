@@ -2,8 +2,6 @@ package in.mcxiv.botastra.db;
 
 import in.mcxiv.botastra.MemoryContext;
 
-import java.util.List;
-
 public class Memory {
 
     public static final int VALUE_INDEX = 4;
@@ -22,13 +20,27 @@ public class Memory {
     }
 
     public void put(String key, Object value) {
-        dbi.insertValues(
+        if (dbi.queryValues(
                 tableName,
                 reference,
-                context.identity(),
-                key,
-                value
-        );
+                String.valueOf(context.identity()),
+                key).isEmpty())
+            dbi.insertValues(
+                    tableName,
+                    reference,
+                    context.identity(),
+                    key,
+                    value
+            );
+        else
+            dbi.postUpdate(String.format("""
+                        UPDATE %1$S
+                        SET    data_point_3='%5$S'
+                        WHERE
+                            reference='%2$s'      AND
+                            data_point_1='%3$s'   AND
+                            data_point_2='%4$s';
+                    """, tableName, reference, context.identity(), key, value));
     }
 
     protected EntryAstra get(String key) {

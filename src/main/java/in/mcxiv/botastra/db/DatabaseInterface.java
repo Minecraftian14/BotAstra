@@ -109,6 +109,10 @@ public class DatabaseInterface {
         return postQuery("SHOW TABLES;", true);
     }
 
+    public ResultSet selectStar(String tableName) {
+        return postQuery("SELECT * FROM " + tableName + ";", true);
+    }
+
     public static int rowCount(ResultSet resultSet) {
         Try.Ignore(resultSet::last);
         int count = Try.Ignore(resultSet::getRow, -1);

@@ -33,7 +33,7 @@ public abstract class ALog extends FLog {
     static HashMap<String, String[]> map = new HashMap<>();
 
     {
-        map.put("in.mcxiv.botastra.Platform", new String[]{"b"});
+        map.put("in.mcxiv.test.Bot:testCommand", new String[]{":$B:"});
     }
 
     @Override

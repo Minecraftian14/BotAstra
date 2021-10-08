@@ -42,12 +42,23 @@ public class LisAdaMeta {
     public MethodSpec.Builder createAMethod(String eventClassName) {
         assert map.containsKey(eventClassName);
 
+        String packageName = eventClassName.substring(0,eventClassName.lastIndexOf("."));
+        String className = eventClassName.substring(eventClassName.lastIndexOf(".")+1);
+
         return MethodSpec.methodBuilder(map.get(eventClassName))
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Override.class)
-                .addParameter(ParameterSpec.builder(ClassName.get("package", map.get(eventClassName)), "event" )
+                .addParameter(ParameterSpec.builder(ClassName.get(packageName, className), "event" )
                         .addAnnotation(NotNull.class)
-                        .build());
+                        .build())
+                .addCode("""
+                        if(event.getAuthor().isBot()) return;
+                        String raw = verifyCommand(event.getMessage().getContentRaw());
+                        if(raw==null) return;
+                        """);
+
+        // TODO: add prefix check
+        // use String rawContent = event.getMessage().getContentRaw();
     }
 
 

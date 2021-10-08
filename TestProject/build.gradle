@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+}
+
+group 'in.mcxiv.test'
+version '0.0.1'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+}
+
+configurations {
+    hehe
+    implementation.extendsFrom(hehe)
+}
+
+dependencies {
+    implementation project(":")
+    annotationProcessor project(":")
+
+    // https://github.com/Minecraftian14/MyLOGGER
+    implementation 'com.github.Minecraftian14:MyLOGGER:v5.6'
+
+    // https://github.com/DV8FromTheWorld/JDA
+    implementation 'net.dv8tion:JDA:4.3.0_333'
+}

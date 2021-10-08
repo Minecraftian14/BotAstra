@@ -12,6 +12,7 @@ public class EntryAstra {
     private int rows;
     private int columns;
     private final Object[] array;
+    private final boolean isEmpty;
 
     public EntryAstra(ResultSet resultSet) {
         columns = Try.Ignore(() -> resultSet.getMetaData().getColumnCount(), -1);
@@ -19,8 +20,10 @@ public class EntryAstra {
 
         ArrayList<Object> list = new ArrayList<>();
 
+        boolean flagIsEmpty = true; // let's assume it's empty.
         try {
             while (resultSet.next()) {
+                flagIsEmpty = false; // we got a value, therefore it's not empty.
                 for (int colIdx = 0; colIdx < columns; colIdx++)
                     list.add(resultSet.getObject(colIdx + 1));
                 rows++;
@@ -28,6 +31,7 @@ public class EntryAstra {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+        isEmpty = flagIsEmpty;
 
         array = list.toArray();
     }
@@ -58,5 +62,9 @@ public class EntryAstra {
             if (Objects.equals(array[i], value))
                 return true;
         return false;
+    }
+
+    public boolean isEmpty() {
+        return isEmpty;
     }
 }

@@ -1,6 +1,5 @@
 package in.mcxiv.botastra.eventsmanagers;
 
-import in.mcxiv.botastra.proc.BaseCompatibilityListenerAdapter;
 import in.mcxiv.botastra.util.Try;
 
 import java.lang.reflect.InvocationTargetException;
@@ -32,12 +31,6 @@ public class MessageCompiler {
         return null;
     }
 
-    public static void main(String[] args) {
-        for (Method method : BaseCompatibilityListenerAdapter.TestClass.class.getDeclaredMethods()) {
-            System.out.println(method.getName());
-        }
-    }
-
     public static <T> T createSchemaObjectE(String text, Class<T> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
         T instance = clazz.getConstructor().newInstance();
@@ -48,13 +41,26 @@ public class MessageCompiler {
 
         Object[] paramVal = new Object[paramCls.length];
 
-        for (int i = 0; i < Math.min(args.length, paramVal.length); i++) {
-            paramVal[i] = switch (Type.classToType(paramCls[i])){
-                case INT -> intify(args[i]);
-                case FLOAT -> floatify(args[i]);
-                case BOOLEAN -> booleanify(args[i]);
-                case STRING -> stringify(args[i]);
-            };
+        BI_FOR_LOOP_STRUCT:
+        {
+            int i = 0;
+            for (; i < Math.min(args.length, paramVal.length); i++) {
+                paramVal[i] = switch (Type.classToType(paramCls[i])) {
+                    case INT -> intify(args[i]);
+                    case FLOAT -> floatify(args[i]);
+                    case BOOLEAN -> booleanify(args[i]);
+                    case STRING -> stringify(args[i]);
+                };
+            }
+
+            for (; i < paramVal.length; i++) {
+                paramVal[i] = switch (Type.classToType(paramCls[i])) {
+                    case INT -> -1;
+                    case FLOAT -> -1f;
+                    case BOOLEAN -> false;
+                    case STRING -> "";
+                };
+            }
         }
 
         constructor.invoke(instance, paramVal);
@@ -75,7 +81,7 @@ public class MessageCompiler {
         return Try.Ignore(() -> Boolean.parseBoolean(arg), false);
     }
 
-    private static String  stringify(String arg) {
+    private static String stringify(String arg) {
         return arg;
     }
 

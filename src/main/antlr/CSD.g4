@@ -31,20 +31,25 @@ csd
 
 
 
-arr
-   : primitive_type '[' ']'
-   | arr '[' ']'
-   ;
-
-
-
 obj
-   : '{' pair (',' pair)* '}'
+   : '{' entry (',' entry)* '}'
    | '{' '}'
    ;
 
+entry
+   : word
+   | pair
+   ;
+
 pair
-   : VARIABLE_NAME ':' type
+   : word ':' type
+   ;
+
+
+
+arr
+   : primitive_type ARRAY_IDENTIFIER+
+   | obj ARRAY_IDENTIFIER+
    ;
 
 
@@ -67,6 +72,16 @@ primitive_type
    ;
 
 
+
+word
+   : VARIABLE_NAME
+   ;
+
+
+
+ARRAY_IDENTIFIER
+   : '[]'
+   ;
 
 VARIABLE_NAME
    : VARIABLE_NAME_START VARIABLE_NAME_CONTENT*

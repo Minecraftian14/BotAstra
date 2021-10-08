@@ -3,3 +3,4 @@
 /.gradle/
 src/main/resources/app.properties
 *.db
+TestProject/src/main/resources/app.properties
